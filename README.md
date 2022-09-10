@@ -40,7 +40,10 @@ To use your new S3 bucket from the AWS CLI you will need to create an IAM user w
 
 * Download census.csv from the data folder in the starter repository.
    * Information on the dataset can be found <a href="https://archive.ics.uci.edu/ml/datasets/census+income" target="_blank">here</a>.
-* Create a remote DVC remote pointing to your S3 bucket and commit the data.
+* Create a remote DVC remote pointing to your S3 bucket and commit the data. 
+   - To set remote directory in S3, use `dvc remote add s3_remote s3://mlops-census-project/data/`
+   - To commit the data, `dvc add data/census.csv`
+   - Then, we can push by using `dvc push`, (this assumes `s3_remote` is a default remote)
 * This data is messy, try to open it in pandas and see what you get.
 * To clean it, use your favorite text editor to remove all spaces.
 * Commit this modified data to DVC under a new name (we often want to keep the raw data untouched but then can keep updating the cooked version).
