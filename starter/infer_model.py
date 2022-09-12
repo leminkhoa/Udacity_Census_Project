@@ -2,8 +2,8 @@ import pandas as pd
 import joblib
 import logging
 from hydra import compose, initialize
-from ml.data import process_data
-from ml.model import inference
+from starter.ml.data import process_data
+from starter.ml.model import inference
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
