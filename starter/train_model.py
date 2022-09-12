@@ -4,9 +4,11 @@ import hydra
 import joblib
 import warnings
 import logging
+import json
+import pprint
 from sklearn.model_selection import train_test_split, GridSearchCV
 from ml.data import process_data
-from ml.model import infer_model, train_model, inference, compute_model_metrics
+from ml.model import infer_model, train_model, inference, compute_model_metrics, slice_compute_model_metrics
 from omegaconf import OmegaConf
 
 warnings.filterwarnings("ignore")
@@ -77,12 +79,22 @@ def main(config: OmegaConf):
     preds = inference(clf, X_test)
 
     # Compute model metrics
-    logger.info("Validating model...")
+    logger.info("Compute overall model metrics...")
     precision, recall, fbeta = compute_model_metrics(y_test, preds)
-    with open(config.metrics.output_path, 'w') as f:
-        f.write(f"Precision: {precision}\nRecall: {recall}\nFbeta: {fbeta}")
-        logger.info(f"Metrics results saved to path '{config.metrics.output_path}'")
+    with open(config.metrics.overall_output_path, 'w') as f:
+        f.write(json.dumps(dict(
+            precision=precision,
+            recall=recall,
+            fbeta=fbeta
+        ), indent=4))
+        logger.info(f"Overall metrics results saved to path '{config.metrics.overall_output_path}'")
 
+    # Compute model metrics per slice
+    logger.info("Compute model metrics per slice...")
+    slice_result = slice_compute_model_metrics(test, preds, categorical_features=cat_features, label=label, lb=lb)
+    with open(config.metrics.slice_output_path, 'w') as f:
+        f.write(json.dumps(slice_result, indent=4))
+        logger.info(f"Slice metrics results saved to path '{config.metrics.slice_output_path}'")
 
 if __name__ == "__main__":
     main()

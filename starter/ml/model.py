@@ -1,5 +1,6 @@
 import importlib
 import logging
+from collections import defaultdict
 from sklearn.metrics import fbeta_score, precision_score, recall_score
 from sklearn.model_selection import GridSearchCV
 
@@ -80,9 +81,22 @@ def compute_model_metrics(y, preds):
     fbeta = fbeta_score(y, preds, beta=1, zero_division=1)
     precision = precision_score(y, preds, zero_division=1)
     recall = recall_score(y, preds, zero_division=1)
-    logger.info(f"""
-        'fbeta': {fbeta},
-        'precision': {precision},
-        'recall': {recall},
-    """)
     return precision, recall, fbeta
+
+
+def slice_compute_model_metrics(test, preds, categorical_features, label, lb):
+    result = defaultdict(lambda: defaultdict(dict))
+
+    for category in categorical_features:
+        for cls in test[category].unique():
+            test_temp = test.loc[test[category]==cls, label]
+            test_temp = lb.transform(test_temp.values).ravel()
+            preds_temp = preds[test[category]==cls]
+            precision, recall, fbeta = compute_model_metrics(test_temp, preds_temp)
+            metrics = dict(
+                precision=precision,
+                recall=recall,
+                fbeta=fbeta
+            )
+            result[category][cls] = metrics
+    return result

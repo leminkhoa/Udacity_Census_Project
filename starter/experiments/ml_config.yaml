@@ -35,5 +35,6 @@ modeling:
         max_depth: [6]
   
 metrics:
-  output_path: model/metrics/${main.model}_computed_metrics.txt
+  overall_output_path: model/metrics/output.txt
+  slice_output_path: model/metrics/slice_output.txt
 
