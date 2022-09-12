@@ -1,0 +1,39 @@
+hydra:  
+  output_subdir: null  
+  run:  
+    dir: .
+    
+main:
+  data: data/census_updated.csv
+  model: random_forest
+  categorical_cols:
+    - workclass
+    - education
+    - marital_status
+    - occupation
+    - relationship
+    - race
+    - sex
+    - native_country
+  label_col: salary
+  random_state: 42
+
+GridSearchCV:
+  scoring: accuracy
+  cv: 5
+  n_jobs: -1
+
+modeling:
+  model_output_path: model/trained_${main.model}_model.joblib
+  lb_output_path: model/transformer/lb.joblib
+  encoder_output_path: model/transformer/encoder.joblib
+  models:
+    random_forest:
+      module: "${module:sklearn.ensemble, RandomForestClassifier}"
+      hyperparameters:
+        n_estimators: [10]
+        max_depth: [6]
+  
+metrics:
+  output_path: model/metrics/${main.model}_computed_metrics.txt
+
