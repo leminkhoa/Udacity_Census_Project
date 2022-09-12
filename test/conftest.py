@@ -15,13 +15,13 @@ def config():
 
 @pytest.fixture(scope='session')
 def raw_data():
-    raw_data = pd.read_csv('data/census_updated.csv', nrows=50)
+    raw_data = pd.read_csv('test/census_test_sample.csv', nrows=50)
     return raw_data
 
 
 @pytest.fixture(scope='session')
 def cleaned_data():
-    raw_data = pd.read_csv('data/census_updated.csv', nrows=50)
+    raw_data = pd.read_csv('test/census_test_sample.csv', nrows=50)
     return raw_data
 
 
