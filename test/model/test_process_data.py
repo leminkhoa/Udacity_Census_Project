@@ -1,5 +1,5 @@
 from sklearn.model_selection import train_test_split
-from starter.ml.data import process_data
+from training.ml.data import process_data
 
 
 def test__process_data(cleaned_data, config):

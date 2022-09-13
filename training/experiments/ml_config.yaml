@@ -1,3 +1,8 @@
+defaults:  
+  - _self_  
+  - override hydra/hydra_logging: default
+  - override hydra/job_logging: custom
+
 hydra:  
   output_subdir: null  
   run:  
@@ -24,7 +29,7 @@ GridSearchCV:
   n_jobs: -1
 
 modeling:
-  model_output_path: model/trained_${main.model}_model.joblib
+  model_output_path: model/trained_model.joblib
   lb_output_path: model/transformer/lb.joblib
   encoder_output_path: model/transformer/encoder.joblib
   models:
@@ -37,4 +42,3 @@ modeling:
 metrics:
   overall_output_path: model/metrics/output.txt
   slice_output_path: model/metrics/slice_output.txt
-

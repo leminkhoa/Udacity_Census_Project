@@ -3,7 +3,7 @@ from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
 from sklearn.base import is_classifier
-from starter.ml.model import infer_model, train_model, inference, compute_model_metrics
+from training.ml.model import infer_model, train_model, inference, compute_model_metrics
 
 
 def test__infer_model():

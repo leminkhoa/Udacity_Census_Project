@@ -15,5 +15,4 @@ def test__import_config_list(config):
 
 
 def test__import_config_referenced_variable(config):
-    model = config.main.model
-    assert config.modeling.model_output_path == f'model/trained_{model}_model.joblib'
+    assert config.modeling.model_output_path == f'model/trained_model.joblib'

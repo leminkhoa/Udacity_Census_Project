@@ -5,7 +5,6 @@ import joblib
 import warnings
 import logging
 import json
-import pprint
 from sklearn.model_selection import train_test_split, GridSearchCV
 from ml.data import process_data
 from ml.model import infer_model, train_model, inference, compute_model_metrics, slice_compute_model_metrics
@@ -18,23 +17,19 @@ OmegaConf.register_new_resolver(
             model_name=module_name,
             import_module=module_path))
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
-logger = logging.getLogger()
-
-
 @hydra.main(config_path='experiments', config_name='ml_config')
 def main(config: OmegaConf):
     # Load data
-    logger.info("Load dataset...")
+    logging.info("Load dataset...")
     data = pd.read_csv(config.main.data)
     # Optional enhancement, use K-fold cross validation instead of a train-test split.
-    logger.info("Split train, test...")
+    logging.info("Split train, test...")
     train, test = train_test_split(data, test_size=0.20, random_state=config.main.random_state)
 
     cat_features = config.main.categorical_cols
     label = config.main.label_col
 
-    logger.info("Preprocessing on train and test datasets...")
+    logging.info("Preprocessing on train and test datasets...")
     # Process the train data with the process_data function.
     X_train, y_train, encoder, lb = process_data(
         train, categorical_features=cat_features, label=label, training=True
@@ -56,21 +51,21 @@ def main(config: OmegaConf):
             cv=config.GridSearchCV.cv,
             n_jobs=config.GridSearchCV.n_jobs,
     )
-    logger.info(f"GridSearch configurations: \n \t"
+    logging.info(f"GridSearch configurations: \n \t"
                 f"Model: {chosen_model},\n \tParams: {params},\n \t"
                 f"Scoring: {config.GridSearchCV.scoring}")
 
     # Train and save model.
-    logger.info("Start training...")
+    logging.info("Start training...")
     clf = train_model(X_train, y_train, gs)
     joblib.dump(clf, config.modeling.model_output_path)
-    logger.info(f"Model saved to path '{config.modeling.model_output_path}'")
+    logging.info(f"Model saved to path '{config.modeling.model_output_path}'")
 
     # Save other transformers
     joblib.dump(lb, config.modeling.lb_output_path)
-    logger.info(f"Label encoder saved to path '{config.modeling.lb_output_path}'")
+    logging.info(f"Label encoder saved to path '{config.modeling.lb_output_path}'")
     joblib.dump(encoder, config.modeling.encoder_output_path)
-    logger.info(f"Feature encoder saved to path '{config.modeling.encoder_output_path}'")
+    logging.info(f"Feature encoder saved to path '{config.modeling.encoder_output_path}'")
 
     # Load the model
     clf = joblib.load(config.modeling.model_output_path)
@@ -79,7 +74,7 @@ def main(config: OmegaConf):
     preds = inference(clf, X_test)
 
     # Compute model metrics
-    logger.info("Compute overall model metrics...")
+    logging.info("Compute overall model metrics...")
     precision, recall, fbeta = compute_model_metrics(y_test, preds)
     with open(config.metrics.overall_output_path, 'w') as f:
         f.write(json.dumps(dict(
@@ -87,14 +82,14 @@ def main(config: OmegaConf):
             recall=recall,
             fbeta=fbeta
         ), indent=4))
-        logger.info(f"Overall metrics results saved to path '{config.metrics.overall_output_path}'")
+        logging.info(f"Overall metrics results saved to path '{config.metrics.overall_output_path}'")
 
     # Compute model metrics per slice
-    logger.info("Compute model metrics per slice...")
+    logging.info("Compute model metrics per slice...")
     slice_result = slice_compute_model_metrics(test, preds, categorical_features=cat_features, label=label, lb=lb)
     with open(config.metrics.slice_output_path, 'w') as f:
         f.write(json.dumps(slice_result, indent=4))
-        logger.info(f"Slice metrics results saved to path '{config.metrics.slice_output_path}'")
+        logging.info(f"Slice metrics results saved to path '{config.metrics.slice_output_path}'")
 
 if __name__ == "__main__":
     main()

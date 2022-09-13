@@ -1,8 +1,8 @@
 import pandas as pd
 from fastapi import FastAPI
 from fastapi import HTTPException
-from starter.ml.schema import *
-from starter.infer_model import predict_salary
+from training.ml.schema import *
+from training.infer_model import predict_salary
 
 import os
 

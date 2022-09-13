@@ -2,11 +2,11 @@ import pandas as pd
 import joblib
 import logging
 from hydra import compose, initialize
-from starter.ml.data import process_data
-from starter.ml.model import inference
+from training.ml.data import process_data
+from training.ml.model import inference
 
 # Initialize logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
+logging.basicConfig(level=logging.INFO, format="[%(asctime)s] - [%(filename)15s] - [%(name)s] - [%(levelname)s] - %(message)s")
 logger = logging.getLogger()
 
 # Import config
@@ -38,6 +38,7 @@ def predict_salary(item):
     )
 
     # predict
+    logger.info("Predict output")
     preds = inference(clf, X)
     # Convert back
     salary = lb.inverse_transform(preds)[0]

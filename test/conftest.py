@@ -2,13 +2,13 @@ import pytest
 import pandas as pd
 import warnings
 from hydra import compose, initialize
-from starter.ml.data import process_data
+from training.ml.data import process_data
 warnings.filterwarnings("ignore")
 
 
 @pytest.fixture(scope='session')
 def config():
-    with initialize(config_path='../starter/experiments', version_base=None):
+    with initialize(config_path='../training/experiments', version_base=None):
         cfg = compose(config_name="ml_config")
     return cfg
 

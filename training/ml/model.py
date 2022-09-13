@@ -4,10 +4,6 @@ from collections import defaultdict
 from sklearn.metrics import fbeta_score, precision_score, recall_score
 from sklearn.model_selection import GridSearchCV
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
-logger = logging.getLogger()
-
-
 def infer_model(model_name: str, import_module: str, model_params={}):
     """Returns a scikit-learn model."""
     model_class = getattr(importlib.import_module(import_module), model_name)
@@ -38,9 +34,9 @@ def train_model(X_train, y_train, model):
     if isinstance(model, GridSearchCV):
         # Print out best params
         best_parameters = model.best_params_
-        logger.info(f"Training completed! Best params: {best_parameters}")
+        logging.info(f"Training completed! Best params: {best_parameters}")
     else:
-        logger.info("Training completed! ")
+        logging.info("Training completed! ")
 
     return model
 
