@@ -40,6 +40,7 @@ def predict_salary(item):
     # predict
     logger.info("Predict output")
     preds = inference(clf, X)
+    
     # Convert back
     salary = lb.inverse_transform(preds)[0]
     return salary

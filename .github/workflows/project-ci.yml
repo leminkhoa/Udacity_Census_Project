@@ -30,6 +30,8 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Set up DVC
       uses: iterative/setup-dvc@v1
+    - name: Run DVC pull to pull data from remote
+      run: dvc pull -f
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
