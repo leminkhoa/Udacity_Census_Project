@@ -5,7 +5,9 @@ import joblib
 import warnings
 import logging
 import json
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.metrics import plot_roc_curve, confusion_matrix, ConfusionMatrixDisplay
 from ml.data import process_data
 from ml.model import infer_model, train_model, inference, compute_model_metrics, slice_compute_model_metrics
 from omegaconf import OmegaConf
@@ -73,6 +75,33 @@ def main(config: OmegaConf):
     # predict
     preds = inference(clf, X_test)
 
+    # ROC Curve
+    logging.info("Generating ROC curve report...")
+    plt.figure(figsize=(20, 10))
+    ax = plt.gca()
+    plot_roc_curve(clf, X_test, y_test).plot(ax=ax, alpha=0.8)
+    plt.title("ROC Curve")
+    plt.savefig(config.plots.roc_output_path)
+    plt.close()
+    logging.info(
+        "Saved ROC curve result at %s !",
+        config.plots.roc_output_path
+    )
+
+    # Confusion matrix
+    logging.info("Generating Confusion Matrix...")
+    plt.figure(figsize=(20, 10))
+    ax = plt.gca()
+    cm = confusion_matrix(y_test, preds, labels=clf.classes_)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
+    disp.plot()
+    plt.title("Confusion Matrix")
+    plt.savefig(config.plots.cm_output_path)
+    plt.close()
+    logging.info(
+        "Saved Confusion Matrix result at %s !",
+        config.plots.cm_output_path)
+
     # Compute model metrics
     logging.info("Compute overall model metrics...")
     precision, recall, fbeta = compute_model_metrics(y_test, preds)
@@ -90,6 +119,7 @@ def main(config: OmegaConf):
     with open(config.metrics.slice_output_path, 'w') as f:
         f.write(json.dumps(slice_result, indent=4))
         logging.info(f"Slice metrics results saved to path '{config.metrics.slice_output_path}'")
+
 
 if __name__ == "__main__":
     main()

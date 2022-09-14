@@ -36,9 +36,14 @@ modeling:
     random_forest:
       module: "${module:sklearn.ensemble, RandomForestClassifier}"
       hyperparameters:
-        n_estimators: [10]
-        max_depth: [6]
+        n_estimators: [200, 300]
+        max_depth: [6, 7, 8]
+        min_samples_split: [4, 6]
   
 metrics:
   overall_output_path: model/metrics/output.txt
   slice_output_path: model/metrics/slice_output.txt
+
+plots:
+  roc_output_path: model/plots/cm_result.png
+  cm_output_path: model/plots/roc_curve_result.png

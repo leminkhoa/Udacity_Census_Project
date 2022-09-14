@@ -57,9 +57,9 @@ salary: str - (Binary: "<=50K" or ">50K")
     - fbeta
 - Current performance:
 ``` 
-Precision: 0.8105263157894737
-Recall: 0.49013367281986
-Fbeta: 0.6108687028956764
+"precision": 0.799412915851272,
+"recall": 0.5200509229789942,
+"fbeta": 0.630158118010027
 ```
 
 ## Analysis
