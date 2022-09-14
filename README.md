@@ -1,8 +1,8 @@
-# Deploying a Machine Learning Model with Heroku and FastAPI
+# 💡 Deploying a Machine Learning Model with Heroku and FastAPI
 In this project, we will apply the skills to develop a classification model on publicly available Census Bureau data. We will create unit tests to monitor the model performance on various slices of the data. Then, we will deploy your model using the FastAPI package and create API tests. Both the slice-validation and the API tests will be incorporated into a CI/CD framework using GitHub Actions.
 
 
-# Environment Set up
+# 🏗️ Environment Set up
 ## Conda Environment
    - Download and install conda if you don’t have it already.
    - Use the supplied requirements file to create a new environment, or
@@ -90,7 +90,7 @@ In this project, we will apply the skills to develop a classification model on p
     │   └── schema.py
     └── train_model.py  # Run this script to train model
 ```
-# Getting started
+# ⭐ Getting started
 ## EDA
 There is a prepared notebook for analyse and investigate data used for this project. To start notebook, from project root directory run: 
 ```
@@ -127,7 +127,7 @@ uvicorn main:app --host=0.0.0.0 --port=5000
 or just run the bash script `./start_uvicorn.sh`
 
 To view the Swagger of API, navigate to `localhost:5000/docs` after starting the server. You should see the following UI
-[swagger](screenshots/swagger.png)
+![swagger](screenshots/swagger.png)
 
 ## Deploy application to Heroku
 To deploy application to Heroku from local Git repository, following instructions from: https://devcenter.heroku.com/articles/git
@@ -137,4 +137,8 @@ To deploy application to Heroku from local Git repository, following instruction
 After deploying application to Heroku, to test POST query from Heroku server, run the script `python post_request.py`. 
 
 This should return `status code` and `response body` regarding to your requests. Feel free to adjust the body inside the script to test different scenarios
-[live_post](screenshots/live_post.png)
+![live_post](screenshots/live_post.png)
+
+# Quick links:
+- Heroku: https://mlmodel-fastapi-khoale.herokuapp.com/
+- Github: https://github.com/leminkhoa/Udacity_Census_Project

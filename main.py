@@ -27,6 +27,6 @@ async def predict(item: Item):
     try:
         salary = predict_salary(item)
     except Exception as err:
-        raise HTTPException(status_code=500, defailt=str(err))
+        raise HTTPException(status_code=500, detail=str(err))
     else:
         return {"pred_salary": salary}
