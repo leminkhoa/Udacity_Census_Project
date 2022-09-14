@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Union
 from enum import Enum
 
+
 class SalaryResponse(str, Enum):
     lte_50k = '<=50K'
     gt_50k = '>50K'

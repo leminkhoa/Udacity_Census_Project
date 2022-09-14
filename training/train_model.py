@@ -19,6 +19,7 @@ OmegaConf.register_new_resolver(
             model_name=module_name,
             import_module=module_path))
 
+
 @hydra.main(config_path='experiments', config_name='ml_config')
 def main(config: OmegaConf):
     # Load data
@@ -53,9 +54,11 @@ def main(config: OmegaConf):
             cv=config.GridSearchCV.cv,
             n_jobs=config.GridSearchCV.n_jobs,
     )
-    logging.info(f"GridSearch configurations: \n \t"
+    logging.info('''
+                f"GridSearch configurations: \n \t"
                 f"Model: {chosen_model},\n \tParams: {params},\n \t"
-                f"Scoring: {config.GridSearchCV.scoring}")
+                f"Scoring: {config.GridSearchCV.scoring}
+                ''')
 
     # Train and save model.
     logging.info("Start training...")

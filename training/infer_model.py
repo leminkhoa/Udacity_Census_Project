@@ -4,6 +4,7 @@ import logging
 from hydra import compose, initialize
 from training.ml.data import process_data
 from training.ml.model import inference
+from training.ml.schema import Item
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s] - [%(filename)15s] - [%(name)s] - [%(levelname)s] - %(message)s")
@@ -14,7 +15,19 @@ with initialize(version_base=None, config_path="experiments"):
     config = compose(config_name="ml_config")
 
 
-def predict_salary(item):
+def predict_salary(item: Item):
+    '''
+    Predict Salary from a Item body.
+
+    Inputs
+    ------
+    item : class Item
+
+    Returns
+    -------
+    salary: str
+        String label that represent predicted salary
+    '''
     # load user inputs
     input_json = {k: [v] for k, v in dict(item).items()}
     logger.info(f"Load input \n {input_json}")
@@ -40,7 +53,7 @@ def predict_salary(item):
     # predict
     logger.info("Predict output")
     preds = inference(clf, X)
-    
+
     # Convert back
     salary = lb.inverse_transform(preds)[0]
     return salary

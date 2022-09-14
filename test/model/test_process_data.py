@@ -3,6 +3,7 @@ from training.ml.data import process_data
 
 
 def test__process_data(cleaned_data, config):
+    '''Test process_data function'''
     train, test = train_test_split(cleaned_data, test_size=0.20, random_state=42)
     X_train, y_train, encoder, lb = process_data(
         train, categorical_features=config.main.categorical_cols, label='salary', training=True

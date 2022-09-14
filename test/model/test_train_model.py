@@ -7,29 +7,34 @@ from training.ml.model import infer_model, train_model, inference, compute_model
 
 
 def test__infer_model():
+    '''Test infer_model function'''
     inferred_model = infer_model('RandomForestClassifier', 'sklearn.ensemble')
     assert isinstance(inferred_model, RandomForestClassifier)
 
 
 def test__train_model_random_forest(processed_data):
+    '''Test train_model function on RandomForest algorithm'''
     X, y, _, _ = processed_data
     clf = train_model(X, y, RandomForestClassifier(n_estimators=5))
     assert is_classifier(clf)
 
 
 def test__train_model_svc(processed_data):
+    '''Test train_model function on SVC algorithm'''
     X, y, _, _ = processed_data
     clf = train_model(X, y, SVC())
     assert is_classifier(clf)
 
 
 def test__train_model_logistic(processed_data):
+    '''Test train_model function on Logistic Regression algorithm'''
     X, y, _, _ = processed_data
     clf = train_model(X, y, LogisticRegression())
     assert is_classifier(clf)
 
 
 def test__train_model_grid(processed_data):
+    '''Test train_model function on GridSearchCV'''
     X, y, _, _ = processed_data
     clf = train_model(X, y, GridSearchCV(
         estimator=RandomForestClassifier(),
@@ -41,6 +46,7 @@ def test__train_model_grid(processed_data):
 
 
 def test__inference(processed_data):
+    '''Test inference function and predicted outputs'''
     X, y, _, _ = processed_data
     clf = train_model(X, y, LogisticRegression())
     pred = inference(clf, X)
@@ -49,6 +55,7 @@ def test__inference(processed_data):
 
 
 def test__compute_model_metrics(processed_data):
+    '''Test compute_model_metrics'''
     X, y, _, _ = processed_data
     clf = train_model(X, y, LogisticRegression())
     pred = inference(clf, X)

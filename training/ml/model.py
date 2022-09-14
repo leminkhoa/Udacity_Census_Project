@@ -4,6 +4,7 @@ from collections import defaultdict
 from sklearn.metrics import fbeta_score, precision_score, recall_score
 from sklearn.model_selection import GridSearchCV
 
+
 def infer_model(model_name: str, import_module: str, model_params={}):
     """Returns a scikit-learn model."""
     model_class = getattr(importlib.import_module(import_module), model_name)
@@ -81,13 +82,33 @@ def compute_model_metrics(y, preds):
 
 
 def slice_compute_model_metrics(test, preds, categorical_features, label, lb):
+    """
+    Validates the trained machine learning model categorical slices.
+
+    Inputs
+    ------
+    test : np.array
+        Known labels, binarized.
+    preds : np.array
+        Predicted labels, binarized.
+    categorical_features: list
+        List of categories to be computed
+    label: str
+        Label column name
+    lb: sklearn.preprocessing._label.LabelBinarizer
+        Trained LabelBinarizer
+    Returns
+    -------
+    result: defaultdict
+        Ditionary that holds computed metrics on each slice
+    """
     result = defaultdict(lambda: defaultdict(dict))
 
     for category in categorical_features:
         for cls in test[category].unique():
-            test_temp = test.loc[test[category]==cls, label]
+            test_temp = test.loc[test[category] == cls, label]
             test_temp = lb.transform(test_temp.values).ravel()
-            preds_temp = preds[test[category]==cls]
+            preds_temp = preds[test[category] == cls]
             precision, recall, fbeta = compute_model_metrics(test_temp, preds_temp)
             metrics = dict(
                 precision=precision,
