@@ -1,78 +1,140 @@
-Working in a command line environment is recommended for ease of use with git and dvc. If on Windows, WSL1 or 2 is recommended.
+# Deploying a Machine Learning Model with Heroku and FastAPI
+In this project, we will apply the skills to develop a classification model on publicly available Census Bureau data. We will create unit tests to monitor the model performance on various slices of the data. Then, we will deploy your model using the FastAPI package and create API tests. Both the slice-validation and the API tests will be incorporated into a CI/CD framework using GitHub Actions.
+
 
 # Environment Set up
-* Download and install conda if you don’t have it already.
-    * Use the supplied requirements file to create a new environment, or
-    * conda create -n [envname] "python=3.10.7" scikit-learn dvc pandas pandas-profiling=3.2.0 numpy pytest jupyter jupyterlab fastapi uvicorn hydra-core -c conda-forge
-    * Install git either through conda (“conda install git”) or through your CLI, e.g. sudo apt-get git.
+## Conda Environment
+   - Download and install conda if you don’t have it already.
+   - Use the supplied requirements file to create a new environment, or
+   - To create a local conda environment for the project, run:
+   ```
+   conda create -n [envname] "python=3.10.7" scikit-learn dvc pandas pandas-profiling=3.2.0 numpy pytest jupyter jupyterlab fastapi uvicorn hydra-core -c conda-forge
+   ```
+   - To activate local environment, run `conda activate [envname]`
+   - Install git either through conda (“conda install git”) or through your CLI, e.g. sudo apt-get git.
 
-## Repositories
+## Git/DVC
+   - Set up the repository with Git and DVC by running:
+   ```
+   git init
+   dvc init
+   ```
 
-* Create a directory for the project and initialize Git and DVC.
-   * As you work on the code, continually commit changes. Trained models you want to keep must be committed to DVC.
-* Connect your local Git repository to GitHub.
-
-## Set up S3
-
-* In your CLI environment install the<a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html" target="_blank"> AWS CLI tool</a>.
-* In the navigation bar in the Udacity classroom select **Open AWS Gateway** and then click **Open AWS Console**. You will not need the AWS Access Key ID or Secret Access Key provided here.
-* From the Services drop down select S3 and then click Create bucket.
-* Give your bucket a name, the rest of the options can remain at their default.
-
-To use your new S3 bucket from the AWS CLI you will need to create an IAM user with the appropriate permissions. The full instructions can be found <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html#id_users_create_console" target="_blank">here</a>, what follows is a paraphrasing:
-
-* Sign in to the IAM console <a href="https://console.aws.amazon.com/iam/" target="_blank">here</a> or from the Services drop down on the upper navigation bar.
-* In the left navigation bar select **Users**, then choose **Add user**.
-* Give the user a name and select **Programmatic access**.
-* In the permissions selector, search for S3 and give it **AmazonS3FullAccess**
-* Tags are optional and can be skipped.
-* After reviewing your choices, click create user. 
-* Configure your AWS CLI to use the Access key ID and Secret Access key.
-
-## GitHub Actions
-
-* Setup GitHub Actions on your repository. You can use one of the pre-made GitHub Actions if at a minimum it runs pytest and flake8 on push and requires both to pass without error.
-   * Make sure you set up the GitHub Action to have the same version of Python as you used in development.
-* Add your <a href="https://github.com/marketplace/actions/configure-aws-credentials-action-for-github-actions" target="_blank">AWS credentials to the Action</a>.
-* Set up <a href="https://github.com/iterative/setup-dvc" target="_blank">DVC in the action</a> and specify a command to `dvc pull`.
-
-## Data
-
-* Download census.csv from the data folder in the starter repository.
-   * Information on the dataset can be found <a href="https://archive.ics.uci.edu/ml/datasets/census+income" target="_blank">here</a>.
-* Create a remote DVC remote pointing to your S3 bucket and commit the data. 
-   - To set remote directory in S3, use `dvc remote add s3_remote s3://mlops-census-project/data/`
-   - To commit the data, `dvc add data/census.csv`
+## Remote Storage on S3
+   - In CLI environment install the<a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html" target="_blank"> AWS CLI tool</a>. 
+   - Make sure you've already configured your AWS credentials in `.aws`
+   - From the Services drop down select S3 and then click Create bucket.
+   - Give your bucket a name, the rest of the options can remain at their default.
+   - Create a remote DVC remote pointing to your S3 bucket and commit the data. 
+   - To set remote directory in S3, use `dvc remote add s3_remote s3://<bucket_name>`
+   - To commit the data, for example, run `dvc add data/census.csv` and `dvc commit data/census.csv`
    - Then, we can push by using `dvc push`, (this assumes `s3_remote` is a default remote)
-* This data is messy, try to open it in pandas and see what you get.
-* To clean it, use your favorite text editor to remove all spaces.
-* Commit this modified data to DVC under a new name (we often want to keep the raw data untouched but then can keep updating the cooked version).
 
-## Model
+## Heroku 
+   - Create a Heroku account at `https://signup.heroku.com/`
 
-* Using the starter code, write a machine learning model that trains on the clean data and saves the model. Complete any function that has been started.
-* Write unit tests for at least 3 functions in the model code.
-* Write a function that outputs the performance of the model on slices of the data.
-   * Suggestion: for simplicity, the function can just output the performance on slices of just the categorical features.
-* Write a model card using the provided template.
+# Repository Structure
+```
+├── Aptfile          # Store url to Heroku buildpack
+├── Procfile         # Initial script for Heroku to start server
+├── README.md                       
+├── data             # Data used for project
+│   ├── census.csv.dvc     # dvc config to pull raw data
+│   └── census_updated.csv.dvc      # dvc config to pull cleaned data
+├── dvc_on_heroku_instructions.md
+├── eda              # Folder for EDA tasks
+│   ├── eda_raw.ipynb      # EDA on raw data
+│   └── eda_updated.ipynb  # EDA on cleaned data
+├── main.py          # Script to run app
+├── post_request.py  # Script to send POST request to Heroku server
+├── model            # Store model outputs
+│   ├── metrics      # Metrics outputs
+│   │   ├── output.txt
+│   │   └── slice_output.txt
+│   ├── plots        # Plotting artifacts
+│   │   ├── cm_result.png
+│   │   └── roc_curve_result.png
+│   ├── trained_model.joblib.dvc    # dvc config to pull trained model
+│   └── transformer                 # transformer of train process
+│       └── encoder.joblib.dvc
+│       └── lb.joblib.dvc
+├── model_card.md       # model card
+├── pytest.ini
+├── requirements.txt    # Python libraries used in project
+├── runtime.txt         # Python version, used for Heroku
+├── sanitycheck.py      # Script to run sanitycheck on api test
+├── screenshots         
+├── setup.py
+├── start_uvicorn.sh    # Bash script to start uvicorn server locally
+├── test                # Folder stores test cases
+│   ├── api
+│   │   ├── test_api_local.py
+│   │   └── test_api_remote.py
+│   ├── census_test_sample.csv
+│   ├── conftest.py
+│   └── model
+│       ├── test_load_data.py
+│       ├── test_ml_config.py
+│       ├── test_process_data.py
+│       └── test_train_model.py
+└── training            # Store configs and scripts to train and infer model
+    ├── __init__.py
+    ├── experiments
+    │   ├── hydra       # Custom setting for hydra behavior
+    │   └── ml_config.yaml
+    ├── infer_model.py
+    ├── ml
+    │   ├── __init__.py
+    │   ├── data.py
+    │   ├── model.py
+    │   └── schema.py
+    └── train_model.py  # Run this script to train model
+```
+# Getting started
+## EDA
+There is a prepared notebook for analyse and investigate data used for this project. To start notebook, from project root directory run: 
+```
+jupyter notebook
+```
+Then navigate to `localhost:8888` from your browser.
 
-## API Creation
+## Train model
+In this project we will be building a machine learning model that can predict whether a U.S. citizen makes over 50K a year. 
 
-* Create a RESTful API using FastAPI this must implement:
-   * GET on the root giving a welcome message.
-   * POST that does model inference.
-   * Type hinting must be used.
-   * Use a Pydantic model to ingest the body from POST. This model should contain an example.
-    * Hint: the data has names with hyphens and Python does not allow those as variable names. Do not modify the column names in the csv and instead use the functionality of FastAPI/Pydantic/etc to deal with this.
-* Write 3 unit tests to test the API (one for the GET and two for POST, one that tests each prediction).
+By default, the model is trained using GridSearch CV with the following config (check [ml_config](training/experiments/ml_config.yaml) for details)
+```
+hyperparameters:
+   n_estimators: [200, 300]
+   max_depth: [6, 7, 8]
+   min_samples_split: [4, 6]
+```
+To train model, run `python training/train_model.py`.
+This will train and store all outputs in `model` folder of this repository.
 
-## API Deployment
+## Unit tests
+A set of unit tests is designed for testing functions and api call.
 
-* Create a free Heroku account (for the next steps you can either use the web GUI or download the Heroku CLI).
-* Create a new app and have it deployed from your GitHub repository.
-   * Enable automatic deployments that only deploy if your continuous integration passes.
-   * Hint: think about how paths will differ in your local environment vs. on Heroku.
-   * Hint: development in Python is fast! But how fast you can iterate slows down if you rely on your CI/CD to fail before fixing an issue. I like to run flake8 locally before I commit changes.
-* Set up DVC on Heroku using the instructions contained in the starter directory.
-* Set up access to AWS on Heroku, if using the CLI: `heroku config:set AWS_ACCESS_KEY_ID=xxx AWS_SECRET_ACCESS_KEY=yyy`
-* Write a script that uses the requests module to do one POST on your live API.
+To run all test, from terminal, run:
+```
+pytest
+```
+
+## Test API from local environment
+To test if the api works properly, firstly, we can start the `uvicorn` server by running:
+```
+uvicorn main:app --host=0.0.0.0 --port=5000
+```
+or just run the bash script `./start_uvicorn.sh`
+
+To view the Swagger of API, navigate to `localhost:5000/docs` after starting the server. You should see the following UI
+[swagger](screenshots/swagger.png)
+
+## Deploy application to Heroku
+To deploy application to Heroku from local Git repository, following instructions from: https://devcenter.heroku.com/articles/git
+
+
+## Send requests to deployed API from Heroku
+After deploying application to Heroku, to test POST query from Heroku server, run the script `python post_request.py`. 
+
+This should return `status code` and `response body` regarding to your requests. Feel free to adjust the body inside the script to test different scenarios
+[live_post](screenshots/live_post.png)

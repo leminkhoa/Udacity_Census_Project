@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi import HTTPException
-from training.ml.schema import *
+from training.ml.schema import Item, Response
 from training.infer_model import predict_salary
 
 import os
@@ -14,6 +14,7 @@ if "DYNO" in os.environ and os.path.isdir(".dvc"):
 # Initialize app
 app = FastAPI()
 
+
 # GET method.
 @app.get("/")
 async def greetings():
@@ -26,6 +27,6 @@ async def predict(item: Item):
     try:
         salary = predict_salary(item)
     except Exception as err:
-        raise HTTPException(status_code=500)
+        raise HTTPException(status_code=500, defailt=str(err))
     else:
         return {"pred_salary": salary}
